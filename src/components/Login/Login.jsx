@@ -1,12 +1,13 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase.init";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Login = () => {
 
     const [success, setSuccess] = useState(false);
     const [loginError, setLoginError] = useState('');
+    const emailRef = useRef();
 
     const handleLogin = e => {
         e.preventDefault();
@@ -36,6 +37,20 @@ const Login = () => {
             })
     }
 
+    const handleForgetPassword = () => {
+        console.log('get me email address', emailRef.current.value);
+        const email = emailRef.current.value;
+        if (!email) {
+            console.log('Please provide a valid email address')
+
+        } else {
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    alert('Reset email sent, please check your email')
+                })
+        }
+    }
+
     return (
         <div className="hero bg-base-200 min-h-screen">
             <div className="hero-content flex-col lg:flex-row-reverse">
@@ -48,14 +63,14 @@ const Login = () => {
                             <label className="label">
                                 <span className="label-text">Email</span>
                             </label>
-                            <input type="email" name="email" placeholder="email" className="input input-bordered" required />
+                            <input type="email" name="email" ref={emailRef} placeholder="email" className="input input-bordered" required />
                         </div>
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text">Password</span>
                             </label>
                             <input type="password" name="password" placeholder="password" className="input input-bordered" required />
-                            <label className="label">
+                            <label onClick={handleForgetPassword} className="label">
                                 <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                             </label>
                         </div>
